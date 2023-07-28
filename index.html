@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <title>Stone - Paper - Scissors</title>
+        <link rel="stylesheet" href="style.css" />
+
+        <!-- Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Borel&family=Tektur&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <div class="tab-bar">
+            <h2
+                style="
+                    position: absolute;
+                    left: 250px;
+                    top: 1px;
+                    text-decoration: underline;
+                "
+            >
+                Stone - Paper & Scissors
+            </h2>
+        </div>
+
+        <h1 class="player-1-header">Player 1</h1>
+        <h1 class="player-2-header">Player 2</h1>
+        <img
+            src="/images/stone-paper-scissor/player-1-scissor.png"
+            class="player--1-image"
+        />
+
+        <img
+            src="/images/stone-paper-scissor/player-2-scissor.png"
+            class="player--2-image"
+        />
+
+        <h2
+            style="
+                position: absolute;
+                left: 780px;
+                top: 700px;
+                font-family: 'Borel', cursive;
+                font-size: 40px;
+            "
+        >
+            Winner
+        </h2>
+
+        <button class="play--button">Play</button>
+        <output id="output"></output>
+
+        <script src="javascript.js"></script>
+    </body>
+</html>
