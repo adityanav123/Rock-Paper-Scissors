@@ -7,50 +7,38 @@
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
-            href="https://fonts.googleapis.com/css2?family=Borel&family=Tektur&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Borel&family=Caveat:wght@600&family=Tektur&display=swap"
             rel="stylesheet"
         />
     </head>
     <body>
         <div class="tab-bar">
-            <h2
-                style="
-                    position: absolute;
-                    left: 35%;
-                    top: 1%;
-                    text-decoration: underline;
-                "
-            >
-                Stone - Paper & Scissors
-            </h2>
+            <h2 class="game__name">Stone - Paper & Scissors</h2>
         </div>
 
-        <h1 class="player-1-header">Player 1</h1>
-        <h1 class="player-2-header">Player 2</h1>
-        <img
-            src="images/stone-paper-scissor/player-1-scissor.png"
-            class="player--1-image"
-        />
+        <h1 class="player-1-header">Your Name</h1>
+        <h1 class="player-2-header">Computer</h1>
+        <img src="images/test/player-1-scissor.png" class="player--1-image" />
 
-        <img
-            src="images/stone-paper-scissor/player-2-scissor.png"
-            class="player--2-image"
-        />
+        <div class="choice__options">
+            <button class="btn__choice btn__rock">
+                <img src="/images/stone-icon.png" alt="stone icon" />
+            </button>
+            <button class="btn__choice btn__paper">
+                <img src="/images/paper-icon.png" alt="paper icon" />
+            </button>
+            <button class="btn__choice btn__scissor">
+                <img src="/images/scissor-icon.png" alt="scissor icon" />
+            </button>
+            <h3 class="choice__footer"><u> Your Choice </u></h3>
+        </div>
 
-        <h2
-            style="
-                position: absolute;
-                left: 90%;
-                top: 80%;
-                font-family: 'Borel', cursive;
-                font-size: 40px;
-            "
-        >
-            Winner
-        </h2>
+        <img src="images/test/player-2-rock.png" class="player--2-image" />
 
-        <button class="play--button">Play</button>
+        <!-- OUTPUT -->
+        <h2 id="output_header">Winner</h2>
         <output id="output"></output>
+        <button class="play--button">Play</button>
 
         <script src="javascript.js"></script>
     </body>
