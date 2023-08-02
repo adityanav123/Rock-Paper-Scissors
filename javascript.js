@@ -87,10 +87,9 @@ const checkWinner = function (player1, player2) {
                 : `${capturePlayerName} Wins!`;
     }
 
-    const winnerHeader = winner.split(` `)[0];
-    if (winnerHeader === `Computer`) {
+    if (winner === `Computer Wins!`) {
         ++computerScore;
-    } else if (winnerHeader === `${capturePlayerName}`) {
+    } else if (winner === `${capturePlayerName} Wins!`) {
         ++playerScore;
     }
 
