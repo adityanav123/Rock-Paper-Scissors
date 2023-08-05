@@ -5,8 +5,8 @@
     -   [x] Add options to choose for the player.
     -   [x] Add scores to gameplay
     -   [ ] Add High Scores Option
-    -   [ ] UI/UX update for different screen sizes.
-    -   [ ] Game ending (maybe at 20/30 pts.)
+    -   [x] Game Pause and Restart.
+    -   [x] Game ending (maybe at 20/30 pts.)
     -   [ ] Score retention (cookies?)
     -   [ ] TBD..
 

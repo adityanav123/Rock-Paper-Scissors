@@ -50,7 +50,7 @@ const gameState = {
     playing: true,
     playerScore: 0,
     computerScore: 0,
-    winningScore: 5,
+    winningScore: 20,
     winner: ``,
     playerName: ``,
 
