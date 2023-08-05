@@ -33,7 +33,7 @@
 
 .player-1-header {
     position: absolute;
-    left: 10%;
+    left: 7%;
     top: 15%;
     font-family: "Caveat", cursive;
     font-size: 55;
@@ -41,7 +41,7 @@
 
 .player-2-header {
     position: absolute;
-    left: 80%;
+    left: 77%;
     top: 15%;
     font-family: "Caveat", cursive;
     font-size: 55;
@@ -107,6 +107,7 @@
     border-radius: 4px;
     align-items: center;
     display: inline-flex;
+    cursor: pointer;
 }
 
 .btn__paper {
@@ -118,6 +119,7 @@
     border-radius: 4px;
     align-items: center;
     display: inline-flex;
+    cursor: pointer;
 }
 
 .btn__scissor {
@@ -130,6 +132,7 @@
     border-radius: 4px;
     align-items: center;
     display: inline-flex;
+    cursor: pointer;
 }
 
 .choice__footer {

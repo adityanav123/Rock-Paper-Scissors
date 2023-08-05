@@ -148,8 +148,9 @@ const checkWinner = function (player1, player2) {
     }
 
     playerNameEle.textContent =
-        gameState.playerName + ` [ ${gameState.playerScore} ]`;
-    computerNameEle.textContent = `Computer [ ${gameState.computerScore} ]`;
+        gameState.playerName +
+        ` [ ${gameState.playerScore} / ${gameState.winningScore}]`;
+    computerNameEle.textContent = `Computer [ ${gameState.computerScore} / ${gameState.winningScore}]`;
 
     // check game over condition
     checkGameOver(gameState);
