@@ -1,5 +1,33 @@
 `use strict`;
 
+const initGame = function () {
+    fetchName();
+    gameState.playerScore = 0;
+    gameState.computerScore = 0;
+    gameState.playing = true;
+    gameState.winner = ``;
+    gameOverMessage.style.display = `none`;
+    computerNameEle.textContent = `Computer`;
+
+    const bodyChildren = document.body.children;
+    for (const child of bodyChildren) {
+        if (child !== gameOverMessage) {
+            child.classList.remove(`blurry_container`);
+        }
+    }
+    winnerOutput.textContent = ``;
+};
+
+const fetchName = function () {
+    setPlayerDetails()
+        .then((playerName) => {
+            gameState.playerName = playerName;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+};
+
 const setPlayerDetails = function () {
     document.body.style.filter = `blur(20px)`;
 
@@ -17,20 +45,33 @@ const setPlayerDetails = function () {
 
 const choices = [`scissor`, `rock`, `paper`];
 
-// player name
-let capturePlayerName;
-setPlayerDetails()
-    .then((playerName) => {
-        capturePlayerName = playerName;
-    })
-    .catch((error) => {
-        console.error(error);
-    });
+// Game State
+const gameState = {
+    playing: true,
+    playerScore: 0,
+    computerScore: 0,
+    winningScore: 5,
+    winner: ``,
+    playerName: ``,
 
-// SCORES
-let playerScore = 0;
-let computerScore = 0;
+    increasePlayerScore() {
+        this.playerScore++;
+    },
 
+    increaseComputerScore() {
+        this.computerScore++;
+    },
+
+    whoIsTheWinner() {
+        this.winner =
+            this.playerScore == this.winningScore
+                ? this.playerName
+                : `Computer`;
+        return this.winner;
+    },
+};
+
+// HTML Elements
 const playButton = document.querySelector(`.play--button`);
 const player1Choice = document.querySelector(`.player--1-image`);
 const player2Choice = document.querySelector(`.player--2-image`);
@@ -38,6 +79,9 @@ const winnerOutput = document.querySelector(`#output`);
 
 const playerNameEle = document.querySelector(`.player-1-header`);
 const computerNameEle = document.querySelector(`.player-2-header`);
+
+const gameOverMessage = document.querySelector(`.game__over__message`);
+const pauseGameMessage = document.querySelector(`.pause__message`);
 
 // player choices
 const chooseRock = document.querySelector(`.btn__rock`);
@@ -53,7 +97,17 @@ let imgSrc2 = player2Choice.getAttribute(`src`).split(`/`);
 imgSrc2.pop();
 const mainSrcPlayer2 = imgSrc2[imgSrc2.length - 1];
 
-// utility method
+// GAME START
+initGame();
+
+// utility functions
+const checkGameOver = function (currentGameState) {
+    currentGameState.playing = !(
+        currentGameState.playerScore >= currentGameState.winningScore ||
+        currentGameState.computerScore >= currentGameState.winningScore
+    );
+};
+
 const checkWinner = function (player1, player2) {
     player1 = player1.toLowerCase();
     player2 = player2.toLowerCase();
@@ -66,7 +120,7 @@ const checkWinner = function (player1, player2) {
                 ? `Computer Wins!`
                 : player2 === `paper`
                 ? `Draw`
-                : `${capturePlayerName} Wins!`;
+                : `${gameState.playerName} Wins!`;
     }
 
     if (player1 === `scissor`) {
@@ -75,7 +129,7 @@ const checkWinner = function (player1, player2) {
                 ? `Computer Wins!`
                 : player2 === `scissor`
                 ? `Draw`
-                : `${capturePlayerName} Wins!`;
+                : `${gameState.playerName} Wins!`;
     }
 
     if (player1 === `rock`) {
@@ -84,69 +138,116 @@ const checkWinner = function (player1, player2) {
                 ? `Computer Wins!`
                 : player2 === `rock`
                 ? `Draw`
-                : `${capturePlayerName} Wins!`;
+                : `${gameState.playerName} Wins!`;
     }
 
     if (winner === `Computer Wins!`) {
-        ++computerScore;
-    } else if (winner === `${capturePlayerName} Wins!`) {
-        ++playerScore;
+        gameState.increaseComputerScore();
+    } else if (winner === `${gameState.playerName} Wins!`) {
+        gameState.increasePlayerScore();
     }
 
-    playerNameEle.textContent = capturePlayerName + ` [ ${playerScore} ]`;
-    computerNameEle.textContent = `Computer [ ${computerScore} ]`;
+    playerNameEle.textContent =
+        gameState.playerName + ` [ ${gameState.playerScore} ]`;
+    computerNameEle.textContent = `Computer [ ${gameState.computerScore} ]`;
+
+    // check game over condition
+    checkGameOver(gameState);
+
+    if (!gameState.playing) {
+        // game over UI
+        gameOverMessage.style.display = `block`;
+        gameOverMessage.textContent = `Game Over! Winner : ${gameState.whoIsTheWinner()}, Press 'r' or 'R' to restart the game.`;
+
+        const bodyChildren = document.body.children;
+        for (const child of bodyChildren) {
+            if (child !== gameOverMessage) {
+                child.classList.toggle(`blurry_container`);
+            }
+        }
+    }
 
     return winner;
 };
 
 // delegate choices to choice container
 choiceContainer.addEventListener(`click`, function (e) {
+    // game over condition
+    if (!gameState.playing) return;
+
     const choice = e.target.closest(".btn__choice");
     if (!choice) return;
 
-    console.log(`button chosen : `, choice);
-
     let playerChose;
+    let playerChoiceImage = ``;
     switch (choice) {
         case chooseRock:
-            player1Choice.setAttribute(
-                `src`,
-                `${imgSrc1.join(`/`)}/player-1-${choices[1]}.png`
-            );
+            playerChoiceImage = `${imgSrc1.join(`/`)}/player-1-${
+                choices[1]
+            }.png`;
             playerChose = 1;
             break;
         case choosePaper:
-            player1Choice.setAttribute(
-                `src`,
-                `${imgSrc1.join(`/`)}/player-1-${choices[2]}.png`
-            );
+            playerChoiceImage = `${imgSrc1.join(`/`)}/player-1-${
+                choices[2]
+            }.png`;
             playerChose = 2;
             break;
         case chooseScissor:
-            player1Choice.setAttribute(
-                `src`,
-                `${imgSrc1.join(`/`)}/player-1-${choices[0]}.png`
-            );
+            playerChoiceImage = `${imgSrc1.join(`/`)}/player-1-${
+                choices[0]
+            }.png`;
             playerChose = 0;
             break;
         default:
             return;
     }
 
+    // SET PLAYER CHOICE IMAGE
+    player1Choice.classList.toggle(`hide`);
+    setTimeout(() => {
+        player1Choice.setAttribute(`src`, playerChoiceImage);
+        player1Choice.classList.toggle(`hide`);
+    }, 500);
+
     // COMPUTER
     const randomChoice2 = Math.trunc(Math.random() * 3);
-    player2Choice.setAttribute(
-        `src`,
-        `${imgSrc1.join(`/`)}/player-2-${choices[randomChoice2]}.png`
-    );
+
+    player2Choice.classList.toggle(`hide`);
+    setTimeout(() => {
+        player2Choice.setAttribute(
+            `src`,
+            `${imgSrc1.join(`/`)}/player-2-${choices[randomChoice2]}.png`
+        );
+        player2Choice.classList.toggle(`hide`);
+    }, 400);
 
     winnerOutput.textContent = checkWinner(
         choices[playerChose],
         choices[randomChoice2]
     );
     winnerOutput.style.textDecoration = `underline`;
+});
 
-    console.log(
-        `Scores : \nplayer : ${playerScore}\nComputer : ${computerScore}`
-    );
+document.body.addEventListener(`keydown`, function (e) {
+    if (gameState.playing) {
+        if (e.key.toLowerCase() === `p`) {
+            // blur the window
+            const bodyChildren = document.body.children;
+
+            for (const child of bodyChildren) {
+                if (child !== pauseGameMessage) {
+                    child.classList.toggle(`blurry_container`);
+                }
+            }
+
+            const pauseMessageOpacity = Number(pauseGameMessage.style.opacity);
+            pauseGameMessage.style.opacity =
+                pauseMessageOpacity === 0 ? 100 : 0;
+        } else {
+            return;
+        }
+    } else if (e.key.toLowerCase() === `r`) {
+        initGame();
+    }
 });
