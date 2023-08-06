@@ -76,7 +76,7 @@ const gameState = {
     playing: true,
     playerScore: 0,
     computerScore: 0,
-    winningScore: 2,
+    winningScore: 20,
     winner: ``,
     playerName: ``,
     paused: false,
