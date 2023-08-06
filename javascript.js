@@ -1,76 +1,5 @@
 `use strict`;
 
-const initGame = function () {
-    fetchName();
-    gameState.playerScore = 0;
-    gameState.computerScore = 0;
-    gameState.playing = true;
-    gameState.winner = ``;
-    gameOverMessage.style.display = `none`;
-    computerNameEle.textContent = `Computer`;
-
-    const bodyChildren = document.body.children;
-    for (const child of bodyChildren) {
-        if (child !== gameOverMessage) {
-            child.classList.remove(`blurry_container`);
-        }
-    }
-    winnerOutput.textContent = ``;
-};
-
-const fetchName = function () {
-    setPlayerDetails()
-        .then((playerName) => {
-            gameState.playerName = playerName;
-        })
-        .catch((error) => {
-            console.error(error);
-        });
-};
-
-const setPlayerDetails = function () {
-    document.body.style.filter = `blur(20px)`;
-
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const playerName = prompt(`Please Enter your name: `);
-            document.querySelector(`.player-1-header`).textContent = playerName;
-
-            document.body.style.filter = `none`;
-
-            resolve(playerName);
-        }, 15);
-    });
-};
-
-const choices = [`scissor`, `rock`, `paper`];
-
-// Game State
-const gameState = {
-    playing: true,
-    playerScore: 0,
-    computerScore: 0,
-    winningScore: 20,
-    winner: ``,
-    playerName: ``,
-
-    increasePlayerScore() {
-        this.playerScore++;
-    },
-
-    increaseComputerScore() {
-        this.computerScore++;
-    },
-
-    whoIsTheWinner() {
-        this.winner =
-            this.playerScore == this.winningScore
-                ? this.playerName
-                : `Computer`;
-        return this.winner;
-    },
-};
-
 // HTML Elements
 const playButton = document.querySelector(`.play--button`);
 const player1Choice = document.querySelector(`.player--1-image`);
@@ -97,14 +26,86 @@ let imgSrc2 = player2Choice.getAttribute(`src`).split(`/`);
 imgSrc2.pop();
 const mainSrcPlayer2 = imgSrc2[imgSrc2.length - 1];
 
+const initGame = function () {
+    setPlayerName();
+    gameState.playerScore = 0;
+    gameState.computerScore = 0;
+    gameState.playing = true;
+    gameState.winner = ``;
+    gameOverMessage.style.display = `none`;
+    computerNameEle.textContent = `Computer`;
+
+    const bodyChildren = document.body.children;
+    for (const child of bodyChildren) {
+        if (child !== gameOverMessage) {
+            child.classList.remove(`blurry_container`);
+        }
+    }
+    winnerOutput.textContent = ``;
+};
+
+const setPlayerName = function () {
+    fetchPlayerName()
+        .then((playerName) => {
+            gameState.playerName = playerName;
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+};
+
+const fetchPlayerName = function () {
+    document.body.style.filter = `blur(20px)`;
+
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const playerName = prompt(`Please Enter your name: `);
+            document.querySelector(`.player-1-header`).textContent = playerName;
+
+            document.body.style.filter = `none`;
+
+            resolve(playerName);
+        }, 15);
+    });
+};
+
+const choices = [`scissor`, `rock`, `paper`];
+
+// Game State
+const gameState = {
+    playing: true,
+    playerScore: 0,
+    computerScore: 0,
+    winningScore: 2,
+    winner: ``,
+    playerName: ``,
+    paused: false,
+
+    increasePlayerScore() {
+        this.playerScore++;
+    },
+
+    increaseComputerScore() {
+        this.computerScore++;
+    },
+
+    whoIsTheWinner() {
+        this.winner =
+            this.playerScore == this.winningScore
+                ? this.playerName
+                : `Computer`;
+        return this.winner;
+    },
+};
+
 // GAME START
 initGame();
 
 // utility functions
-const checkGameOver = function (currentGameState) {
-    currentGameState.playing = !(
-        currentGameState.playerScore >= currentGameState.winningScore ||
-        currentGameState.computerScore >= currentGameState.winningScore
+const checkGameOver = function () {
+    gameState.playing = !(
+        gameState.playerScore >= gameState.winningScore ||
+        gameState.computerScore >= gameState.winningScore
     );
 };
 
@@ -153,19 +154,10 @@ const checkWinner = function (player1, player2) {
     computerNameEle.textContent = `Computer [ ${gameState.computerScore} / ${gameState.winningScore}]`;
 
     // check game over condition
-    checkGameOver(gameState);
+    checkGameOver();
 
     if (!gameState.playing) {
-        // game over UI
-        gameOverMessage.style.display = `block`;
-        gameOverMessage.textContent = `Game Over! Winner : ${gameState.whoIsTheWinner()}, Press 'r' or 'R' to restart the game.`;
-
-        const bodyChildren = document.body.children;
-        for (const child of bodyChildren) {
-            if (child !== gameOverMessage) {
-                child.classList.toggle(`blurry_container`);
-            }
-        }
+        setGameOver();
     }
 
     return winner;
@@ -173,8 +165,8 @@ const checkWinner = function (player1, player2) {
 
 // delegate choices to choice container
 choiceContainer.addEventListener(`click`, function (e) {
-    // game over condition
-    if (!gameState.playing) return;
+    // can't play when game end / paused
+    if (!gameState.playing || gameState.paused) return;
 
     const choice = e.target.closest(".btn__choice");
     if (!choice) return;
@@ -230,25 +222,43 @@ choiceContainer.addEventListener(`click`, function (e) {
     winnerOutput.style.textDecoration = `underline`;
 });
 
+// Events for reset and pause game.
 document.body.addEventListener(`keydown`, function (e) {
     if (gameState.playing) {
         if (e.key.toLowerCase() === `p`) {
-            // blur the window
-            const bodyChildren = document.body.children;
-
-            for (const child of bodyChildren) {
-                if (child !== pauseGameMessage) {
-                    child.classList.toggle(`blurry_container`);
-                }
-            }
+            /* GAME PAUSED */
+            blurElementsExcept(pauseGameMessage);
 
             const pauseMessageOpacity = Number(pauseGameMessage.style.opacity);
+
             pauseGameMessage.style.opacity =
                 pauseMessageOpacity === 0 ? 100 : 0;
+
+            gameState.paused = gameState.paused ? false : true;
         } else {
             return;
         }
     } else if (e.key.toLowerCase() === `r`) {
+        /* GAME RESET */
         initGame();
     }
 });
+
+// blur effect, pause / win condition
+const blurElementsExcept = function (element) {
+    const bodyChildren = document.body.children;
+
+    for (const child of bodyChildren) {
+        if (child !== element) {
+            child.classList.toggle(`blurry_container`);
+        }
+    }
+};
+
+// game over UI
+const setGameOver = function () {
+    gameOverMessage.style.display = `block`;
+    gameOverMessage.textContent = `Game Over! Winner : ${gameState.whoIsTheWinner()}, Press 'r' or 'R' to restart the game.`;
+
+    blurElementsExcept(gameOverMessage);
+};
