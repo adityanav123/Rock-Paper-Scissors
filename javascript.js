@@ -11,6 +11,10 @@ const computerNameEle = document.querySelector(`.player-2-header`);
 
 const gameOverMessage = document.querySelector(`.game__over__message`);
 const pauseGameMessage = document.querySelector(`.pause__message`);
+const resumeButton = document.querySelector(`.pause_button`);
+const gameRestartButton = document.querySelector(`.reset_button`);
+const pauseButton = document.querySelector(`.pause_enable_button`);
+const pauseMessageMain = document.querySelector(`.pause_message_main`);
 
 // player choices
 const chooseRock = document.querySelector(`.btn__rock`);
@@ -37,11 +41,21 @@ const initGame = function () {
 
     const bodyChildren = document.body.children;
     for (const child of bodyChildren) {
-        if (child !== gameOverMessage) {
+        if (![gameOverMessage, gameRestartButton].includes(child)) {
             child.classList.remove(`blurry_container`);
         }
     }
     winnerOutput.textContent = ``;
+    gameRestartButton.style.display = `none`;
+
+    if (isWebsiteUsedOnMobile()) {
+        pauseButton.style.display = `block`;
+        pauseGameMessage.style.opacity = 0;
+        pauseMessageMain.style.opacity = 0;
+    }
+    if (!isWebsiteUsedOnMobile()) {
+        pauseButton.style.display = `none`;
+    }
 };
 
 const setPlayerName = function () {
@@ -76,7 +90,7 @@ const gameState = {
     playing: true,
     playerScore: 0,
     computerScore: 0,
-    winningScore: 20,
+    winningScore: 10,
     winner: ``,
     playerName: ``,
     paused: false,
@@ -98,10 +112,18 @@ const gameState = {
     },
 };
 
+// Extra Utility methods
+const isWebsiteUsedOnMobile = function () {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+    );
+    // return true;
+};
+
 // GAME START
 initGame();
 
-// utility functions
+// game methods
 const checkGameOver = function () {
     gameState.playing = !(
         gameState.playerScore >= gameState.winningScore ||
@@ -201,7 +223,7 @@ choiceContainer.addEventListener(`click`, function (e) {
     setTimeout(() => {
         player1Choice.setAttribute(`src`, playerChoiceImage);
         player1Choice.classList.toggle(`hide`);
-    }, 500);
+    }, 400);
 
     // COMPUTER
     const randomChoice2 = Math.trunc(Math.random() * 3);
@@ -225,16 +247,9 @@ choiceContainer.addEventListener(`click`, function (e) {
 // Events for reset and pause game.
 document.body.addEventListener(`keydown`, function (e) {
     if (gameState.playing) {
-        if (e.key.toLowerCase() === `p`) {
+        if (e.key.toLowerCase() === `p` && !isWebsiteUsedOnMobile()) {
             /* GAME PAUSED */
-            blurElementsExcept(pauseGameMessage);
-
-            const pauseMessageOpacity = Number(pauseGameMessage.style.opacity);
-
-            pauseGameMessage.style.opacity =
-                pauseMessageOpacity === 0 ? 100 : 0;
-
-            gameState.paused = gameState.paused ? false : true;
+            togglePause();
         } else {
             return;
         }
@@ -244,12 +259,38 @@ document.body.addEventListener(`keydown`, function (e) {
     }
 });
 
+// game resume button
+resumeButton.addEventListener(`click`, function (e) {
+    if (!gameState.playing) return;
+    togglePause();
+});
+
+const togglePause = function () {
+    blurElementsExcept([pauseGameMessage, resumeButton]);
+    const pauseMessageOpacity = Number(pauseGameMessage.style.opacity);
+
+    pauseGameMessage.style.opacity = pauseMessageOpacity === 0 ? 100 : 0;
+
+    gameState.paused = gameState.paused ? false : true;
+
+    // show pause button
+    resumeButton.style.opacity =
+        isWebsiteUsedOnMobile() && Number(resumeButton.style.opacity) === 0
+            ? 100
+            : 0;
+
+    let pauseMessageText = isWebsiteUsedOnMobile()
+        ? `Game Paused!`
+        : `Game Paused! Press P to Resume`;
+    pauseGameMessage.textContent = pauseMessageText;
+};
+
 // blur effect, pause / win condition
 const blurElementsExcept = function (element) {
     const bodyChildren = document.body.children;
 
     for (const child of bodyChildren) {
-        if (child !== element) {
+        if (!element.includes(child)) {
             child.classList.toggle(`blurry_container`);
         }
     }
@@ -257,8 +298,30 @@ const blurElementsExcept = function (element) {
 
 // game over UI
 const setGameOver = function () {
-    gameOverMessage.style.display = `block`;
-    gameOverMessage.textContent = `Game Over! Winner : ${gameState.whoIsTheWinner()}, Press 'r' or 'R' to restart the game.`;
+    let gameOverText = `Game Over! Winner : ${gameState.whoIsTheWinner()}.`;
+    if (!isWebsiteUsedOnMobile()) {
+        gameOverText += `, Press R to restart the game.`;
+        blurElementsExcept([gameOverMessage]);
+    } else {
+        blurElementsExcept([gameOverMessage, gameRestartButton]);
+        gameRestartButton.style.display = `block`;
+        gameRestartButton.style.opacity =
+            Number(gameRestartButton.style.opacity) === 0 ? 100 : 0;
+    }
 
-    blurElementsExcept(gameOverMessage);
+    gameOverMessage.style.display = `block`;
+    gameOverMessage.textContent = gameOverText;
 };
+
+// pause button in phones
+pauseButton.addEventListener(`click`, () => {
+    if (gameState.paused || !gameState.playing) return;
+    togglePause();
+});
+
+// game restart button
+gameRestartButton.addEventListener(`click`, function (e) {
+    if (gameState.playing) return;
+    gameRestartButton.style.display = `block`;
+    initGame();
+});
