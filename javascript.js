@@ -56,6 +56,11 @@ const initGame = function () {
     if (!isWebsiteUsedOnMobile()) {
         pauseButton.style.display = `none`;
     }
+
+    // reset animation
+    chooseRock.classList.remove(`popup_active`);
+    choosePaper.classList.remove(`popup_active`);
+    chooseScissor.classList.remove(`popup_active`);
 };
 
 const setPlayerName = function () {
@@ -201,18 +206,28 @@ choiceContainer.addEventListener(`click`, function (e) {
                 choices[1]
             }.png`;
             playerChose = 1;
+
+            // animation
+            chooseRock.classList.add(`popup_active`);
+
             break;
         case choosePaper:
             playerChoiceImage = `${imgSrc1.join(`/`)}/player-1-${
                 choices[2]
             }.png`;
             playerChose = 2;
+
+            // animation
+            choosePaper.classList.add(`popup_active`);
             break;
         case chooseScissor:
             playerChoiceImage = `${imgSrc1.join(`/`)}/player-1-${
                 choices[0]
             }.png`;
             playerChose = 0;
+
+            // animation
+            chooseScissor.classList.add(`popup_active`);
             break;
         default:
             return;
@@ -237,11 +252,25 @@ choiceContainer.addEventListener(`click`, function (e) {
         player2Choice.classList.toggle(`hide`);
     }, 400);
 
-    winnerOutput.textContent = checkWinner(
-        choices[playerChose],
-        choices[randomChoice2]
-    );
-    winnerOutput.style.textDecoration = `underline`;
+
+    // animation
+    setTimeout(() => {
+        chooseRock.classList.remove(`popup_active`);
+        choosePaper.classList.remove(`popup_active`);
+        chooseScissor.classList.remove(`popup_active`);
+    }, 1000);
+
+
+    setTimeout(() => {
+        winnerOutput.textContent = checkWinner(
+            choices[playerChose],
+            choices[randomChoice2]
+        );
+        
+        winnerOutput.style.textDecoration = `underline`;
+    }, 400);
+
+   
 });
 
 // Events for reset and pause game.
@@ -325,3 +354,6 @@ gameRestartButton.addEventListener(`click`, function (e) {
     gameRestartButton.style.display = `block`;
     initGame();
 });
+
+
+console.log(`container : `, document.querySelector(`.choice_buttons`));
