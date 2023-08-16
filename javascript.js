@@ -290,7 +290,7 @@ document.body.addEventListener(`keydown`, function (e) {
 
 // game resume button
 resumeButton.addEventListener(`click`, function (e) {
-    if (!gameState.playing) return;
+    if (gameState.playing || gameState.paused) return;
     togglePause();
 });
 
